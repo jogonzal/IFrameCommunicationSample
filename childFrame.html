@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Child frame</title>
+        <script>
+            var message = "Jorge";
+            function displayMessage (evt) {
+                var message;
+                if (evt.origin !== "http://robertnyman.com") {
+                    message = "You are not worthy";
+                }
+                else {
+                    message = "I got " + evt.data + " from " + evt.origin;
+                }	
+                document.getElementById("received-message").innerHTML = message;
+            }
+            
+            // For standards-compliant web browsers
+            window.addEventListener("message", displayMessage, false);
+        </script>
+    </head>    
+    <body>
+        <p>This is in the child frame</p>
+        <p id="received-message"></p>
+        <button id="btn" onclick="buttonClick()">Send info to parent</button>
+    </body>
+</html>

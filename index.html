@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Iframe communication demo</title>
+        <script>
+            var message = "Jorge";
+            var buttonClick = function (e){
+                var childFrameWindow = document.getElementById("childFrame").contentWindow;
+
+                childFrameWindow.postMessage(message, "*");
+            };
+        </script>
+    </head>    
+    <body>
+        <p>This is in the parent frame</p>
+        <button id="btn" onclick="buttonClick()">Send info to child</button>
+        <iframe id="childFrame" src="/childFrame.html"></frame>
+    </body>
+</html>
