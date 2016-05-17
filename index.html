@@ -2,17 +2,36 @@
     <head>
         <title>Iframe communication demo</title>
         <script>
-            var message = "Jorge";
+            var message = [];
+            for(var i = 0; i < 3200000; i++){
+                message.push(i);
+            }
+
+            // listen for messages of child
+
+
             var buttonClick = function (e){
                 var childFrameWindow = document.getElementById("childFrame").contentWindow;
-
-                childFrameWindow.postMessage(message, "*");
+                childFrameWindow.postMessage({
+                    message: message,
+                    now: new Date()
+                }, "*");
             };
         </script>
     </head>    
     <body>
         <p>This is in the parent frame</p>
         <button id="btn" onclick="buttonClick()">Send info to child</button>
-        <iframe id="childFrame" src="/childFrame.html"></frame>
+        <iframe id="childFrame" src="/IFrameCommunicationSample/childFrame.html"></iframe>
+        <p id="received-message"></p>
+        <script>
+            window.addEventListener('message', function(evt){
+                var t1 = new Date();
+                var t0 = evt.data.now;
+                console.log("I got data from " + evt.origin);
+                var totalTime = (t1 - t0);
+                document.getElementById("received-message").innerHTML = "Received info from child. Took " + totalTime + "ms";
+            }, false);
+        </script>
     </body>
 </html>

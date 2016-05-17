@@ -2,20 +2,28 @@
     <head>
         <title>Child frame</title>
         <script>
-            var message = "Jorge";
+            var message = [];
+            for(var i = 0; i < 3200000; i++){
+                message.push(i);
+            }
+
             function displayMessage (evt) {
-                var message;
-                if (evt.origin !== "http://robertnyman.com") {
-                    message = "You are not worthy";
-                }
-                else {
-                    message = "I got " + evt.data + " from " + evt.origin;
-                }	
-                document.getElementById("received-message").innerHTML = message;
+                var t1 = new Date();
+                var t0 = evt.data.now;
+                console.log("I got data from " + evt.origin);
+                var totalTime = (t1 - t0);
+                document.getElementById("received-message").innerHTML = "Received info from parent. Took" + totalTime + "ms";
             }
             
             // For standards-compliant web browsers
             window.addEventListener("message", displayMessage, false);
+
+            function buttonClick(){
+                window.parent.postMessage({
+                    message: message,
+                    now: new Date()
+                }, "*");
+            }
         </script>
     </head>    
     <body>
