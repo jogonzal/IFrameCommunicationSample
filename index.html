@@ -7,31 +7,56 @@
                 message.push(i);
             }
 
-            // listen for messages of child
+            var bounceCount = 100;
+            var childFrameWindow;
 
-
-            var buttonClick = function (e){
-                var childFrameWindow = document.getElementById("childFrame").contentWindow;
+            // Send a message to child
+            var sendInfoToChild = function (e){
                 childFrameWindow.postMessage({
                     message: message,
                     now: new Date()
                 }, "*");
             };
+
+            var bounceMessagesWithChild = function(e){
+                var childFrameWindow = document.getElementById("childFrame").contentWindow;
+                childFrameWindow.postMessage({
+                    message: [],
+                    now: new Date(),
+                    bounce: bounceCount
+                }, "*");
+            }
+
+            // listen for messages of child
+            window.addEventListener('message', function(evt){
+                var t1 = new Date();
+                var t0 = evt.data.now;
+                var totalTime = (t1 - t0);
+                console.log("I got data from " + evt.origin);
+                if (evt.data.bounce != null){
+                    if (evt.data.bounce == 0){
+                        document.getElementById("received-message").innerHTML = "Bounced messages " + bounceCount + " times in " + totalTime + "ms";
+                        return;
+                    }
+                    childFrameWindow.postMessage({
+                        message: [],
+                        now: evt.data.now,
+                        bounce : evt.data.bounce - 1
+                    }, "*");
+                    return;
+                }
+                document.getElementById("received-message").innerHTML = "Received " + evt.data.message.length + " integers from child. Took" + totalTime + "ms";
+            }, false);
         </script>
     </head>    
     <body>
         <p>This is in the parent frame</p>
-        <button id="btn" onclick="buttonClick()">Send info to child</button>
+        <button onclick="sendInfoToChild()">Send info to child</button>
+        <button onclick="bounceMessagesWithChild()">Bounce back messages from child</button>
         <iframe id="childFrame" src="/IFrameCommunicationSample/childFrame.html"></iframe>
         <p id="received-message"></p>
-        <script>
-            window.addEventListener('message', function(evt){
-                var t1 = new Date();
-                var t0 = evt.data.now;
-                console.log("I got data from " + evt.origin);
-                var totalTime = (t1 - t0);
-                document.getElementById("received-message").innerHTML = "Received info from child. Took " + totalTime + "ms";
-            }, false);
-        </script>
+    <script>
+        childFrameWindow = document.getElementById("childFrame").contentWindow;
+    </script>
     </body>
 </html>

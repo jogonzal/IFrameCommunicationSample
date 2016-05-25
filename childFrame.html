@@ -7,23 +7,30 @@
                 message.push(i);
             }
 
-            function displayMessage (evt) {
-                var t1 = new Date();
-                var t0 = evt.data.now;
-                console.log("I got data from " + evt.origin);
-                var totalTime = (t1 - t0);
-                document.getElementById("received-message").innerHTML = "Received info from parent. Took" + totalTime + "ms";
-            }
-            
-            // For standards-compliant web browsers
-            window.addEventListener("message", displayMessage, false);
-
-            function buttonClick(){
+            var buttonClick = function(e){
+                // Send a message to the parent
                 window.parent.postMessage({
                     message: message,
                     now: new Date()
                 }, "*");
             }
+
+            window.addEventListener("message", function (evt) {
+                // Listen for parent's messages
+                var t1 = new Date();
+                var t0 = evt.data.now;
+                console.log("I got data from " + evt.origin);
+                if (evt.data.bounce != null){
+                    window.parent.postMessage({
+                        message: [],
+                        now: evt.data.now,
+                        bounce : evt.data.bounce
+                    }, "*");
+                    return;
+                }
+                var totalTime = (t1 - t0);
+                document.getElementById("received-message").innerHTML = "Received " + evt.data.message.length + " integers from parent. Took" + totalTime + "ms";
+            }, false);
         </script>
     </head>    
     <body>
